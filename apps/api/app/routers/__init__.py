@@ -1,1 +1,1 @@
-"""API route modules."""
+"""Core application configuration and infrastructure."""

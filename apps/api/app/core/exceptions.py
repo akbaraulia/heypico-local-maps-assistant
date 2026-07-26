@@ -36,7 +36,8 @@ class GooglePlacesUnavailableError(AppError):
 
 
 class GooglePlacesRequestError(AppError):
-    def __init__(self) -> None:
+    def __init__(self, status_code: int | None = None) -> None:
+        self.upstream_status_code = status_code
         super().__init__(
             status_code=502,
             code="google_places_request_failed",
@@ -62,6 +63,45 @@ class ServerConfigurationError(AppError):
         )
 
 
+class OllamaError(Exception):
+    def __init__(self, *, status_code: int, message: str) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+        self.message = message
+
+
+class OllamaTimeoutError(OllamaError):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=504,
+            message="The local language model timed out.",
+        )
+
+
+class OllamaUnavailableError(OllamaError):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=503,
+            message="The local language model is unavailable.",
+        )
+
+
+class OllamaRequestError(OllamaError):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=502,
+            message="The local language model request failed.",
+        )
+
+
+class OllamaInvalidResponseError(OllamaError):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=502,
+            message="The local language model returned an invalid response.",
+        )
+
+
 def _error_response(status_code: int, code: str, message: str) -> JSONResponse:
     payload = ErrorResponse(error=ErrorDetail(code=code, message=message))
     return JSONResponse(status_code=status_code, content=payload.model_dump())
@@ -79,6 +119,18 @@ async def rate_limit_error_handler(
     return _error_response(429, "rate_limit_exceeded", "Rate limit exceeded.")
 
 
+async def ollama_error_handler(
+    _request: Request,
+    exc: OllamaError,
+) -> JSONResponse:
+    logger.warning("ollama_api_error status_code=%s", exc.status_code)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
+
+
 def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, app_error_handler)
+    app.add_exception_handler(OllamaError, ollama_error_handler)
     app.add_exception_handler(RateLimitExceeded, rate_limit_error_handler)

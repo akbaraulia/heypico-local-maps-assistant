@@ -1,1 +1,1 @@
-"""External integration services."""
+"""Pydantic request and response schemas."""

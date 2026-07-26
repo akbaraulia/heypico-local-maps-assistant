@@ -45,12 +45,14 @@ def test_valid_search_returns_normalized_places(
                 "user_rating_count": 320,
                 "open_now": True,
                 "primary_type": "restaurant",
+                "price_level": None,
+                "distance_meters": None,
                 "lat": -6.601,
                 "lng": 106.806,
                 "google_maps_url": "https://maps.google.com/?cid=123",
                 "directions_url": (
                     "https://www.google.com/maps/dir/"
-                    "?api=1&destination_place_id=place%2Fwith+spaces"
+                    "?api=1&destination=Warung+Sunda&destination_place_id=place%2Fwith+spaces"
                 ),
             }
         ],

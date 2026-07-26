@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from pydantic import BaseModel, Field, StringConstraints, field_validator
 
@@ -20,10 +20,21 @@ class Place(BaseModel):
     user_rating_count: int | None
     open_now: bool | None
     primary_type: str | None
+    price_level: str | None = None
+    distance_meters: float | None = None
     lat: float
     lng: float
     google_maps_url: str
     directions_url: str
+    current_opening_hours: dict[str, Any] | None = Field(
+        default=None,
+        exclude=True,
+    )
+    regular_opening_hours: dict[str, Any] | None = Field(
+        default=None,
+        exclude=True,
+    )
+    utc_offset_minutes: int | None = Field(default=None, exclude=True)
 
 
 class PlaceSearchResponse(BaseModel):

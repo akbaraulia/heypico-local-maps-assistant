@@ -1,1 +1,1 @@
-"""Backend test suite."""
+"""External integration services."""

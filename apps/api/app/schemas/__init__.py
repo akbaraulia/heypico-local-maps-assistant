@@ -1,1 +1,1 @@
-"""Pydantic request and response schemas."""
+"""API route modules."""

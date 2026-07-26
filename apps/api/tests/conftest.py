@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
 from app.core.config import Settings
+from app.core.rate_limit import limiter
 from app.main import create_app
 
 MockHandler = Callable[[httpx.Request], httpx.Response]
@@ -24,12 +25,21 @@ def client_factory() -> ClientContext:
             app_env="test",
             google_places_timeout_seconds=1,
             places_rate_limit="1000/minute",
+            ollama_base_url="http://localhost:11434",
+            ollama_model="qwen3:4b",
+            ollama_timeout_seconds=1,
+            chat_rate_limit="1000/minute",
+            google_places_location_bias_radius_meters=5000,
         )
         transport = httpx.MockTransport(handler)
-        with TestClient(
-            create_app(settings=settings, http_transport=transport)
-        ) as client:
-            yield client
+        limiter.reset()
+        try:
+            with TestClient(
+                create_app(settings=settings, http_transport=transport)
+            ) as client:
+                yield client
+        finally:
+            limiter.reset()
 
     return factory
 
