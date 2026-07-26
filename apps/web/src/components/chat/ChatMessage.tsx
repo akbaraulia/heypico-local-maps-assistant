@@ -29,26 +29,31 @@ export function ChatMessage({
 }: ChatMessageProps) {
   const isUser = message.role === "user";
 
-  // System/Location confirmation message chip
-  if (isUser && message.isLocationConfirmation) {
-    return (
-      <div className="animate-fade-in-up flex justify-center w-full my-1">
-        <div className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-100/90 px-3.5 py-1 text-xs font-semibold text-zinc-600 shadow-2xs dark:border-zinc-800/80 dark:bg-zinc-800/80 dark:text-zinc-300">
-          <span className="text-xs">📍</span>
-          <span>Using your current location</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Standard User message bubble
+  // Standard User message bubble with optional location confirmation chip
   if (isUser) {
+    if (message.isLocationConfirmation && message.content === "Using my current location") {
+      return (
+        <div className="animate-fade-in-up flex justify-center w-full my-1">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-100/90 px-3.5 py-1 text-xs font-semibold text-zinc-600 shadow-2xs dark:border-zinc-800/80 dark:bg-zinc-800/80 dark:text-zinc-300">
+            <span className="text-xs">📍</span>
+            <span>Using your current location</span>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="animate-fade-in-up flex justify-end w-full">
-        <div className="flex max-w-[85%] sm:max-w-[75%] flex-col items-end">
+        <div className="flex max-w-[85%] sm:max-w-[75%] flex-col items-end gap-1">
           <div className="rounded-2xl rounded-tr-xs bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 px-4 py-2.5 text-xs sm:text-sm font-medium text-white shadow-md shadow-blue-500/15">
             {message.content}
           </div>
+          {message.isLocationConfirmation && (
+            <div className="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 pr-1">
+              <span>📍</span>
+              <span>GPS location attached</span>
+            </div>
+          )}
         </div>
       </div>
     );

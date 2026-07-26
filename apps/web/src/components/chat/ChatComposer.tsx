@@ -58,11 +58,16 @@ export function ChatComposer({
 
   const handleLocationClick = () => {
     if (!navigator.geolocation) return;
+    const currentText = text.trim();
     setIsGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setIsGettingLocation(false);
-        onSend("", {
+        setText("");
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
+        onSend(currentText, {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
         });

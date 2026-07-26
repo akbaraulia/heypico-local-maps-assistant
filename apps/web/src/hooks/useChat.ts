@@ -216,14 +216,23 @@ export function useChat(): UseChatReturn {
           const queryToUse = pendingClarificationQuery;
           setPendingClarificationQuery(null);
           await performSend(
-            "Using my current location",
+            text.trim() || "Using my current location",
             queryToUse,
             history,
             currentContext,
             coords
           );
+        } else if (text.trim()) {
+          // User typed a specific prompt AND clicked Near Me / attached location
+          await performSend(
+            text.trim(),
+            text.trim(),
+            history,
+            currentContext,
+            coords
+          );
         } else {
-          // Near Me clicked without a pending location clarification request
+          // Near Me clicked without a text prompt
           const isIndonesian =
             Boolean(text && /di|sekitar|dekat|cari/i.test(text)) ||
             messages.some((m) =>
